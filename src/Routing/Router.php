@@ -4,6 +4,7 @@ namespace SquallPHP\Routing;
 
 use SquallPHP\Http\Request;
 use SquallPHP\Http\Response;
+use SquallPHP\Routing\Route;
 
 class Router
 {
@@ -13,7 +14,8 @@ class Router
         'PUT' => [],
         'DELETE' => []
     ];
-    
+
+    private $config;
     private $request;
     private $response;
     
@@ -21,11 +23,15 @@ class Router
     {
         $this->request = new Request();
         $this->response = new Response($config);
+
+        $this->config = $config;
     }
 
-    public function get ($route, $callable)
+    public function get ($uri)
     {
-        $this->routes['GET'][$route] = $callable;
+        $route = new Route($this->config);
+        $this->routes['GET'][$uri] = $route;
+        return $route;
     }
 
     public function post ($route, $callable)
@@ -55,7 +61,7 @@ class Router
             die();
         }
 
-        $route = $this->routes[$method][$uri]($req, $res);
+        $this->routes[$method][$uri]->__exec();
     }
 }
 
